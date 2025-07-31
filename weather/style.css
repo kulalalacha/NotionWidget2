@@ -1,0 +1,27 @@
+:root {
+  --main-bg-color: #fff;
+}
+
+[data-theme="gray"] {
+  --main-bg-color: #191919;
+}
+
+body {
+  margin: 0;
+  background-color: var(--main-bg-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.inactiveLink {
+  pointer-events: none;
+  cursor: default;
+}
+
+a.weatherwidget-io {
+  width: 100%;
+  max-width: 450px;
+  min-height: 200px;
+}
