@@ -14,21 +14,33 @@ function formatCoord(coord, positive, negative) {
   return abs + (coord >= 0 ? positive : negative);
 }
 
-function getWeather(lat, lon) {
+function getWeather(lat, lon, city = "hamburg") {
   const el = document.getElementById("weather");
-  const latStr = formatCoord(lat, 'n', 's');
-  const lonStr = formatCoord(lon, 'e', 'w');
-  const url = `https://forecast7.com/en/${latStr}${lonStr}/`;
+
+  // สร้าง format "53d55n10d00e"
+  const latDeg = Math.floor(Math.abs(lat));
+  const latMin = Math.round((Math.abs(lat) - latDeg) * 100);
+  const latDir = lat >= 0 ? "n" : "s";
+
+  const lonDeg = Math.floor(Math.abs(lon));
+  const lonMin = Math.round((Math.abs(lon) - lonDeg) * 100);
+  const lonDir = lon >= 0 ? "e" : "w";
+
+  const urlPart = `${latDeg}d${latMin}${latDir}${lonDeg}d${lonMin}${lonDir}`;
+  const url = `https://forecast7.com/en/${urlPart}/${city.toLowerCase()}/`;
+
+  console.log("✅ URL:", url);
 
   el.setAttribute("href", url);
-  el.setAttribute("data-label_1", "WEATHER");
+  el.setAttribute("data-label_1", city.toUpperCase());
   el.setAttribute("data-icons", "Climacons Animated");
   el.setAttribute("data-mode", "Current");
 
   setTimeout(() => {
     script(document, 'script', 'weatherwidget-io-js');
-  }, 50);
+  }, 150);
 }
+
 
 // Theme
 function light() {
