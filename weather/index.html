@@ -1,22 +1,60 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
-	<meta charset="UTF-8">
-  	<title>Weather</title>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  	<link rel="stylesheet" href="style.css">
-	<!-- Global site tag (gtag.js) - Google Analytics -->
-	<script async src="https://www.googletagmanager.com/gtag/js?id=G-39WWGPP5QV"></script>
-	<script>
-	window.dataLayer = window.dataLayer || [];
-	function gtag(){dataLayer.push(arguments);}
-	gtag('js', new Date());
-
-	gtag('config', 'G-39WWGPP5QV');
-	</script>
+  <meta charset="UTF-8">
+  <title>Weather</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-	<a id="weather" class="weatherwidget-io inactiveLink" href="https://forecast7.com/de/53d559d99/hamburg/" data-label_1="Hamburg" data-icons="Climacons Animated" data-mode="Current"></a>
-	<script  src="script.js"></script>
+  <a id="weather"
+     class="weatherwidget-io"
+     href="https://forecast7.com/en/53d55n10d00e/hamburg/"
+     data-label_1="Your City"
+     data-icons="Climacons Animated"
+     data-mode="Current"
+     data-theme="pure">
+     Weather
+  </a>
+
+  <script>
+    function formatCoord(coord, isLat = true) {
+      const abs = Math.abs(coord);
+      const deg = abs.toFixed(2).replace('.', 'd');
+      const dir = coord >= 0
+        ? (isLat ? 'n' : 'e')
+        : (isLat ? 's' : 'w');
+      return `${deg}${dir}`;
+    }
+
+    function updateWidget(lat, lon) {
+      const latStr = formatCoord(lat, true);
+      const lonStr = formatCoord(lon, false);
+      const url = `https://forecast7.com/en/${latStr}${lonStr}/yourcity/`;
+
+      const el = document.getElementById('weather');
+      el.href = url;
+      el.setAttribute("data-label_1", "CURRENT LOCATION");
+
+      const oldScript = document.getElementById('weatherwidget-script');
+      if (oldScript) oldScript.remove();
+
+      const js = document.createElement('script');
+      js.src = 'https://weatherwidget.io/js/widget.min.js';
+      js.id = 'weatherwidget-script';
+      document.body.appendChild(js);
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        updateWidget(lat, lon);
+      },
+      err => {
+        console.warn("Location not available, fallback to Hamburg");
+        updateWidget(53.55, 10.00);
+      }
+    );
+  </script>
 </body>
 </html>
