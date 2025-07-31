@@ -1,91 +1,88 @@
 function script(d, s, id) {
-  const old = d.getElementById(id);
-  if (old) old.remove();
-
-  const js = d.createElement(s),
-        fjs = d.getElementsByTagName(s)[0];
-  js.id = id;
-  js.src = 'https://weatherwidget.io/js/widget.min.js';
-  fjs.parentNode.insertBefore(js, fjs);
+	var js,
+		fjs = d.getElementsByTagName(s)[0];
+	js = d.createElement(s);
+	js.id = id;
+	js.src = 'https://weatherwidget.io/js/widget.min.js';
+	fjs.parentNode.insertBefore(js, fjs);
 }
 
-function formatCoord(coord, positive, negative) {
-  const abs = Math.abs(coord).toFixed(2).replace('.', 'd');
-  return abs + (coord >= 0 ? positive : negative);
+/* FOR JS LOCAL STORAGE SETTINGS
+let touchEvent = 'ontouchstart' in window ? 'touchstart' : 'click';
+
+window.addEventListener(touchEvent, mode);
+
+function mode() {
+	const currentTheme = document.getElementById('weather').getAttribute('data-theme');
+	console.log(currentTheme);
+	if (currentTheme == 'gray') {
+		light();
+	} else {
+		dark();
+	}
 }
 
-function getWeather(lat, lon, city = "hamburg") {
-  const el = document.getElementById("weather");
-
-  // สร้าง format "53d55n10d00e"
-  const latDeg = Math.floor(Math.abs(lat));
-  const latMin = Math.round((Math.abs(lat) - latDeg) * 100);
-  const latDir = lat >= 0 ? "n" : "s";
-
-  const lonDeg = Math.floor(Math.abs(lon));
-  const lonMin = Math.round((Math.abs(lon) - lonDeg) * 100);
-  const lonDir = lon >= 0 ? "e" : "w";
-
-  const urlPart = `${latDeg}d${latMin}${latDir}${lonDeg}d${lonMin}${lonDir}`;
-  const url = `https://forecast7.com/en/${urlPart}/${city.toLowerCase()}/`;
-
-  console.log("✅ URL:", url);
-
-  el.setAttribute("href", url);
-  el.setAttribute("data-label_1", city.toUpperCase());
-  el.setAttribute("data-icons", "Climacons Animated");
-  el.setAttribute("data-mode", "Current");
-
-  setTimeout(() => {
-    script(document, 'script', 'weatherwidget-io-js');
-  }, 150);
-}
-
-
-// Theme
 function light() {
-  document.documentElement.setAttribute('data-theme', 'pure');
-  const el = document.getElementById('weather');
-  el.setAttribute('data-theme', 'pure');
-  el.removeAttribute('data-basecolor');
-  el.setAttribute('data-textcolor', '#37352f');
-  el.removeAttribute('data-cloudfill');
-  el.setAttribute('data-suncolor', '#F58f70');
+	localStorage.setItem('data-theme', 'pure');
+	document.documentElement.setAttribute('data-theme', 'pure');
+	document.getElementById('weather').setAttribute('data-theme', 'pure');
+	document.getElementById('weather').removeAttribute('data-basecolor');
+	document.getElementById('weather').setAttribute('data-textcolor', '#37352f');
+	document.getElementById('weather').removeAttribute('data-cloudfill');
+	script(document, 'script', 'weatherwidget-io-js');
 }
 
 function dark() {
-  document.documentElement.setAttribute('data-theme', 'gray');
-  const el = document.getElementById('weather');
-  el.setAttribute('data-theme', 'gray');
-  el.setAttribute('data-basecolor', '#191919');
-  el.removeAttribute('data-textcolor');
-  el.setAttribute('data-cloudfill', '#191919');
-  el.setAttribute('data-suncolor', '#F58f70');
+	localStorage.setItem('data-theme', 'gray');
+	document.documentElement.setAttribute('data-theme', 'gray');
+	document.getElementById('weather').setAttribute('data-theme', 'gray');
+	document.getElementById('weather').setAttribute('data-basecolor', '#191919');
+	document.getElementById('weather').removeAttribute('data-textcolor');
+	document.getElementById('weather').setAttribute('data-cloudfill', '#191919');
+	script(document, 'script', 'weatherwidget-io-js');
 }
 
-// Auto-theme
+let currentTheme = localStorage.getItem('data-theme');
+
+if (currentTheme == 'pure') {
+	light();
+} else {
+	dark();
+}
+*/
+
+// DYNAMIC THEME SETTINGS BASED ON OS PREFERENCE
+
+function light() {
+	document.documentElement.setAttribute('data-theme', 'pure');
+	document.getElementById('weather').setAttribute('data-theme', 'pure');
+	document.getElementById('weather').removeAttribute('data-basecolor');
+	document.getElementById('weather').setAttribute('data-textcolor', '#37352f');
+	document.getElementById('weather').removeAttribute('data-cloudfill');
+	document.getElementById('weather').setAttribute('data-suncolor', '#F58f70');
+	script(document, 'script', 'weatherwidget-io-js');
+}
+
+function dark() {
+	document.documentElement.setAttribute('data-theme', 'gray');
+	document.getElementById('weather').setAttribute('data-theme', 'gray');
+	document.getElementById('weather').setAttribute('data-basecolor', '#191919');
+	document.getElementById('weather').removeAttribute('data-textcolor');
+	document.getElementById('weather').setAttribute('data-cloudfill', '#191919');
+	document.getElementById('weather').setAttribute('data-suncolor', '#F58f70');
+	script(document, 'script', 'weatherwidget-io-js');
+}
+
 if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-  dark();
+	dark();
 } else {
-  light();
+	light();
 }
-window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
-  event.matches ? dark() : light();
-});
 
-// Get location from browser
-if (navigator.geolocation) {
-  navigator.geolocation.getCurrentPosition(
-    (position) => {
-      const lat = position.coords.latitude;
-      const lon = position.coords.longitude;
-      getWeather(lat, lon);
-    },
-    (err) => {
-      console.warn("⚠️ Geolocation error, using fallback Hamburg.");
-      getWeather(53.55, 10.00); // fallback Hamburg
-    }
-  );
-} else {
-  getWeather(53.55, 10.00);
-}
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
+	if (event.matches) {
+		dark();
+	} else {
+		light();
+	}
+});
